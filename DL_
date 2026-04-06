@@ -1,0 +1,86 @@
+import numpy as np
+def step(z):
+  if z>=0:
+    return 1
+  else:
+    return 0
+
+def OR(x1, x2):
+  return step(x1 + x2 - 0.5)
+
+def NAND(x1, x2):
+  return step(-2*x1 - 2*x2 + 3)
+
+def AND(x1, x2):
+  return step(x1 + x2 - 1.5)
+
+def XOR(x1, x2):
+  or_output = OR(x1, x2)
+  nand_output = NAND(x1, x2)
+  return AND(or_output, nand_output)
+
+#defining inputs
+inputs = np.array([[0,0],[0,1],[1,0],[1,1]])
+for x1, x2 in inputs:
+  print(XOR(x1,x2))
+
+
+import numpy as np
+
+# Sigmoid Activation
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
+
+def sigmoid_derivative(a):
+    return a * (1 - a)
+
+# XOR Dataset
+X = np.array([[0,0],
+              [0,1],
+              [1,0],
+              [1,1]])
+
+y = np.array([[0],
+              [1],
+              [1],
+              [0]])
+
+np.random.seed(1)
+
+# Network Architecture
+W1 = np.random.randn(2, 4)   # 2 inputs -> 4 hidden neurons
+b1 = np.random.randn(1, 4)
+
+W2 = np.random.randn(4, 1)   # 4 hidden -> 1 output
+b2 = np.random.randn(1, 1)
+
+learning_rate = 0.05
+epochs = 20000
+
+# Training Loop
+for i in range(epochs):
+
+    # Forward Propagation
+    z1 = np.dot(X, W1) + b1
+    a1 = sigmoid(z1)
+
+    z2 = np.dot(a1, W2) + b2
+    output = sigmoid(z2)
+
+    # Error
+    error = y - output
+
+    # Backpropagation
+    d_output = error * sigmoid_derivative(output)
+
+    error_hidden = np.dot(d_output, W2.T)
+    d_hidden = error_hidden * sigmoid_derivative(a1)
+
+    # Update Weights
+    W2 += learning_rate * np.dot(a1.T, d_output)
+    b2 += learning_rate * np.sum(d_output, axis=0, keepdims=True)
+
+    W1 += learning_rate * np.dot(X.T, d_hidden)
+    b1 += learning_rate * np.sum(d_hidden, axis=0, keepdims=True)
+
+print(np.round(output))
